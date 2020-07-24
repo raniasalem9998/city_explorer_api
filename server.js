@@ -44,7 +44,7 @@ app.get('/weather', (request, response) => {
     let city = request.query.city;
     dataCall.data.forEach(element => {
         const date = new Date(element.valid_date);
-        let time = date;
+        let time = date.toString();
         new Weather(city, element, time.substr(0,15)
         );
     });
