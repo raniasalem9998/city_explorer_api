@@ -38,14 +38,14 @@ function Location(city, data){
 
 
 //   ------
-
+// this will give a new array for each location(element)
 app.get('/weather', (request, response) => {
-    const data = require('./data/weather.json');
+    const dataCall = require('./data/weather.json');
     let city = request.query.city;
-    data.data.forEach(element => {
-        const time = new Date(element.valid_date);
-        let longTimeStamp = time.toString();
-        new Weather(city, element, longTimeStamp.toString().substr(0, 15)
+    dataCall.data.forEach(element => {
+        const date = new Date(element.valid_date);
+        let time = date;
+        new Weather(city, element, time
         );
     });
     response.send(Weather.all);
@@ -56,6 +56,7 @@ function Weather(city, data, date) {
     this.time = date;
     Weather.all.push(this);
 }
+//will give each weather with all its properties
 Weather.all = [];
 
 // {
