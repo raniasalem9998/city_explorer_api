@@ -15,7 +15,14 @@ app.listen(PORT, ()=>{
     console.log('Server is listening to port ', PORT);
   });
 
-app.get('../location', (request,response) =>{
+  app.get('/', (request,response) => {
+    response.status(200).send('This is the homepage');
+    response.status(404).send('page not found');
+    response.status(500).send('Internal server error');
+
+  });
+
+app.get('/location', (request,response) =>{
     const data = require('../data/location.json');
     let city = request.query.city;
     let locationData = new Location(city, data);
