@@ -23,7 +23,7 @@ app.listen(PORT, ()=>{
   });
 
 app.get('/location', (request,response) =>{
-    const data = require('../data/location.json');
+    const data = require('./data/location.json');
     let city = request.query.city;
     let locationData = new Location(city, data);
     response.send(locationData);
