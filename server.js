@@ -35,6 +35,29 @@ function Location(city, data){
     this.latitude = data[0].lat;
     this.longitude = data[0].lon;
   }
+
+
+//   ------
+
+app.get('/weather', (request, response) => {
+    const data = require('./data/weather.json');
+    let city = request.query.city;
+    data.data.forEach(element => {
+        const time = new Date(element.valid_date);
+        let longTimeStamp = time.toString();
+        new Weather(city, element, longTimeStamp.toString().substr(0, 15)
+        );
+    });
+    response.send(Weather.all);
+});
+
+function Weather(city, data, date) {
+    this.forecast = data.weather.description;
+    this.time = date;
+    Weather.all.push(this);
+}
+Weather.all = [];
+
 // {
 //     "place_id": "222943963",
 //     "licence": "https://locationiq.com/attribution",
