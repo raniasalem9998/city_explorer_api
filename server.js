@@ -13,22 +13,17 @@ app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 
-app.listen(PORT, () => {
-  console.log('Server is listening to port ', PORT);
-});
-
 app.get('/', (request, response) => {
   response.status(200).send('This is the homepage');
 
 
 });
 
-var city;
+
 app.get('/location', handleLocation);
 
 function handleLocation(request, response) {
-  // const data = require('./data/location.json');
-   city = request.query.city;
+  let city = request.query.city;
   getData(city).then(returnData => {
     response.send(returnData);
   });
@@ -45,7 +40,7 @@ function handleLocation(request, response) {
 
   }
 };
-var loca=[];
+var loca = [];
 function Location(city, data) {
   this.search_query = city;
   this.formatted_query = data[0].display_name;
@@ -57,63 +52,45 @@ function Location(city, data) {
 
 
 //   ------------------------------------------------- //
-// app.get('/weather', (request, response) => {
-//   const dataCall = require('./data/weather.json');
-//   let city = request.query.city;
-//   dataCall.data.forEach(element => {
-//       const date = new Date(element.valid_date);
-//       let time = date.toString();
-//       new Weather(city, element, time.substr(0,15)
-//       );
-//   });
-//   response.send(Weather.all);
-// });
 
-
-app.get('/weather', handleWeather);
-function handleWeather(request, response){
+app.get('/weather', (request, response) => {
   // const dataCall = require('./data/weather.json');
-  Weather.all = [];
-  // let city = request.query.search_query;
-  getData2(city).then(returnData => {
-    response.send(returnData);
+  let cityName = request.query.search_query;
+  let APIKEY2 = process.env.APIKEY2;
+  // let lat = loca[0];
+  // let lon = loca[1];
+  let url2 = `https://api.weatherbit.io/v2.0/forecast/daily?city=${cityName}&key=${APIKEY2}`;
+
+  return superagent.get(url2).then((data) => {
+    Weather.all = [];
+    data.body.data.map(element => {
+        const date = new Date(element.valid_date);
+        let time = date.toString();
+       return new Weather(cityName, element, time.substr(0,15));
+    });
+    response.send(Weather.all);
   });
 
-  function getData2(city){
-    let APIKEY2 = process.env.APIKEY2;
-    let lat = loca[0];
-    let lon = loca[1];
-    // let url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${city},NC&key=${APIKEY2}`;
-    let url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${lat}&lon=${lon},NC&key=${APIKEY2}`;
-
-      return superagent.get(url).then(data =>{
-        data.map(element => {
-          let time = element.valid_date;
-          let newWeather = new Weather(city, element, time);
-          console.log(newWeather)
-          return newWeather;
-        });
-
-      });
-
-  };
-  
-
-};
+});
 
 function Weather(city, data, date) {
+  this.search_query = city;
   this.forecast = data.weather.description;
   this.time = date;
   Weather.all.push(this);
 }
+
+
+app.listen(PORT, () => {
+  console.log('Server is listening to port ', PORT);
+});
+
 //will give each weather with all its properties
 
 app.all('*', (req, res) => {
   res.status(404).send('page not found');
   res.status(500).send('Internal server error');
-})
-
-
+});
 
 // ------------------------------------------------- //
 // Note that Heroku will need to have properly named 
