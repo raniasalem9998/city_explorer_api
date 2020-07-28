@@ -31,7 +31,7 @@ function handleLocation(request, response) {
 
 
   function getData(city) {
-    let APIKEY = process.env.APIKEY;
+    let APIKEY = process.env.GEOCODE_API_KEY;
     let url = `https://api.locationiq.com/v1/autocomplete.php?key=${APIKEY}&q=${city}&format=json?`;
     return superagent.get(url).then(data => {
       let locationData = new Location(city, data.body);
@@ -56,7 +56,7 @@ function Location(city, data) {
 app.get('/weather', (request, response) => {
   // const dataCall = require('./data/weather.json');
   let cityName = request.query.search_query;
-  let APIKEY2 = process.env.APIKEY2;
+  let APIKEY2 = process.env.WEATHER_API_KEY;
   // let lat = loca[0];
   // let lon = loca[1];
   let url2 = `https://api.weatherbit.io/v2.0/forecast/daily?city=${cityName}&key=${APIKEY2}`;
