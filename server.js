@@ -79,35 +79,35 @@ function Weather(city, data, date) {
 
 // ------------------------------------------------- //
 
-app.get('/trail', (request, response) => {
-  let APIKEY3 = process.env.TRAIL_API_KEY;
-  let lat = loca[0];
-  let lon = loca[1];
-  let url3 = `https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lon}&key=${APIKEY3}`;
+// app.get('/trail', (request, response) => {
+//   let APIKEY3 = process.env.TRAIL_API_KEY;
+//   let lat = loca[0];
+//   let lon = loca[1];
+//   let url3 = `https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lon}&key=${APIKEY3}`;
 
-  return superagent.get(url3).then((data) => {
-    Trail.all = [];
-    data.body.data.map(element => {
-      return new Trail(element);
-    });
-    response.send(Trail.all);
-  });
+//   return superagent.get(url3).then((data) => {
+//     Trail.all = [];
+//     data.body.data.map(element => {
+//       return new Trail(element);
+//     });
+//     response.send(Trail.all);
+//   });
 
-});
+// });
 
 
 
-function Trail(data) {
-  this.name = data.name;
-  this.location = data.location;
-  this.stars = data.stars;
-  this.star_votes = data.star_votes;
-  this.trail_url = data.trail_url;
-  this.conditions = data.conditions;
-  this.condition_date = trail.conditionDate.split(" ")[0];
-  this.condition_time = trail.conditionDate.split(" ")[1];
-  Trial.all.push(this);
-}
+// function Trail(data) {
+//   this.name = data.name;
+//   this.location = data.location;
+//   this.stars = data.stars;
+//   this.star_votes = data.star_votes;
+//   this.trail_url = data.trail_url;
+//   this.conditions = data.conditions;
+//   this.condition_date = trail.conditionDate.split(" ")[0];
+//   this.condition_time = trail.conditionDate.split(" ")[1];
+//   Trial.all.push(this);
+// }
 // ------------------------------------------------- //
 // client.connect.then(() =>{
   app.listen(PORT, () => {
