@@ -150,7 +150,6 @@ app.get('/movies', (request, response) => {
   let APIKEY4 = process.env.MOVIE_API_KEY;
   let region = request.query.country_code;
   let url4 = `https://api.themoviedb.org/3/discover/movie?api_key=${APIKEY4}&certification_country=${region}`;
-  // let url4 = 'http://api.themoviedb.org/3/discover/movie?primary_release_date.gte=2014-09-15&primary_release_date.lte=2014-10-22&api_key=44502dd5ab95f4b1c9252315f2e882c5';
 
   return superagent.get(url4).then(data => {
     let arr = [];
@@ -182,8 +181,9 @@ function Movie(data) {
 app.get('/yelp', (request, response) => {
   let lat = request.query.latitude;
   let lon = request.query.longitude;
+  let yelp_key=process.env.YELP_API_KEY;
   let url5 = `https://api.yelp.com/v3/businesses/search?latitude=${lat}&longitude=${lon}`;
-  return superagent.get(url5).then(data => {
+  return superagent.get(url5) .set('Authorization', `Bearer ${yelp_key}` ).then(data => {
     let arr = [];
 
       data.body.businesses.map(element => {
@@ -221,9 +221,10 @@ client.connect().then(() => {
 
 app.all('*', (req, res) => {
   res.status(404).send('page not found');
-  res.status(500).send('Internal server error');
+
 });
 
-
-
+app.all('*', (req, res) => {
+    res.status(500).send('Internal server error');
+});
 
