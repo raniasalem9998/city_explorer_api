@@ -31,7 +31,7 @@ function handleLocation(request, response) {
   client.query(selectSQL).then(result => {
 
     if (result.rowCount) {
-      response.send(result);
+      response.send(result.rows[0]);
     } else {
 
       return superagent.get(url).then(data => {
@@ -39,10 +39,11 @@ function handleLocation(request, response) {
         let queryvalues = [locationData.search_query, locationData.formatted_query, locationData.latitude, locationData.longitude];
         let SQL = 'INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ($1,$2,$3,$4);';
 
-        client.query(SQL, queryvalues).then(location => {
-          response.send(location)
+         client.query(SQL, queryvalues).then(location => {
+          // response.send(location);
+          return location;
         })
-
+        response.send(locationData);
       })
 
     }
@@ -107,7 +108,7 @@ function Weather(city, data, date) {
 
 // ------------------------trail------------------------- //
 
-app.get('/trail', (request, response) => {
+app.get('/trails', (request, response) => {
   let APIKEY3 = process.env.TRAIL_API_KEY;
   let lat = request.query.latitude;
   let lon = request.query.longitude;
@@ -118,7 +119,7 @@ app.get('/trail', (request, response) => {
 
       data.body.trails.map(element => {
       let trai = new Trail(element);
-      array.push(trai);
+      arr.push(trai);
       return arr;
       });
 
@@ -136,8 +137,8 @@ function Trail(data) {
   this.star_votes = data.star_votes;
   this.trail_url = data.trail_url;
   this.conditions = data.conditions;
-  this.condition_date = trail.conditionDate.split(" ")[0];
-  this.condition_time = trail.conditionDate.split(" ")[1];
+  this.condition_date = data.conditionDate.split(" ")[0];
+  this.condition_time = data.conditionDate.split(" ")[1];
 }
 // ------------------------------------------------- //
 
@@ -160,7 +161,7 @@ client.connect().then(() => {
 
 app.all('*', (req, res) => {
   res.status(404).send('page not found');
-  res.status(500).send('Internal server error');
+  // res.status(500).send('Internal server error');
 });
 
 
