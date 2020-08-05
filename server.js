@@ -57,6 +57,7 @@ function Location(city, data) {
   this.formatted_query = data[0].display_name;
   this.latitude = data[0].lat;
   this.longitude = data[0].lon;
+  this.country_code = data[0].address.country_code.toUpperCase();
   loca.push(this.latitude)
   loca.push(this.longitude)
 }
@@ -139,13 +140,72 @@ function Trail(data) {
   this.condition_date = data.conditionDate.split(" ")[0];
   this.condition_time = data.conditionDate.split(" ")[1];
 }
-// ------------------------------------------------- //
+
 
 // for chaching its useless to save life data because its useless and will save alot of it.
 
 // ----------------------movies--------------------------- //
+app.get('/movies', (request, response) => {
+  let APIKEY4 = process.env.MOVIE_API_KEY;
+  let region = request.query.country_code;
+  let url4 = `https://api.themoviedb.org/3/discover/movie?api_key=${APIKEY4}&certification_country=${region}`;
+  // let url4 = 'http://api.themoviedb.org/3/discover/movie?primary_release_date.gte=2014-09-15&primary_release_date.lte=2014-10-22&api_key=44502dd5ab95f4b1c9252315f2e882c5';
 
-// ------------------------------------------------- //
+  return superagent.get(url4).then(data => {
+    let arr = [];
+
+      data.body.results.map(element => {
+      let movie = new Movie(element);
+      arr.push(movie);
+      return arr;
+      });
+
+    response.send(arr);
+  });
+
+});
+
+
+
+function Movie(data) {
+  this.title = data.title;
+  this.overview = data.overview;
+  this.average_votes = data.vote_average;
+  this.image_url =  `https://image.tmdb.org/t/p/w500${data.poster_path}`;
+  this.popularity = data.popularity;
+  this.released_on = data.release_date;
+}
+
+// ----------------------YELP--------------------------- //
+
+app.get('/yelp', (request, response) => {
+  let lat = request.query.latitude;
+  let lon = request.query.longitude;
+  let url5 = `https://api.yelp.com/v3/businesses/search?latitude=${lat}&longitude=${lon}`;
+  return superagent.get(url5).then(data => {
+    let arr = [];
+
+      data.body.businesses.map(element => {
+      let res = new Restaurants(element);
+      arr.push(res);
+      return arr;
+      });
+
+    response.send(arr);
+  });
+
+});
+
+
+
+function Restaurants(data) {
+  this.name = data.name;
+  this.image_url = data.image_url;
+  this.price = data.price;
+  this.rating = data.rating;
+  this.url = data.url;
+}
+
 
 
 client.connect().then(() => {
@@ -157,7 +217,7 @@ client.connect().then(() => {
 
 app.all('*', (req, res) => {
   res.status(404).send('page not found');
-  // res.status(500).send('Internal server error');
+  res.status(500).send('Internal server error');
 });
 
 
