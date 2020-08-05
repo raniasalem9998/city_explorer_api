@@ -9,6 +9,7 @@ const pg = require('pg')
 app.use(cors());
 const client = new pg.Client(process.env.DATABASE_URL);
 
+
 const PORT = process.env.PORT || 3000;
 
 
@@ -212,7 +213,10 @@ client.connect().then(() => {
   app.listen(PORT, () => {
     console.log('Server is listening to port ', PORT);
   });
+
 });
+// });
+
 
 
 app.all('*', (req, res) => {

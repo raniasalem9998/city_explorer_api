@@ -23,6 +23,6 @@ This page will provide the user with informaton about varius cities (weathaer,lo
 - 26-7-2020 4:44pm - Application now has a fully-functional express server, with a GET route for the location resource. 
 - 8-5-2020 - trail added and deploied to heroku.
 
+
 ## app link 
 https://cityexplorer99.herokuapp.com
-
