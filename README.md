@@ -26,3 +26,6 @@ This page will provide the user with informaton about varius cities (weathaer,lo
 
 ## app link 
 https://cityexplorer99.herokuapp.com
+
+## trello link
+https://trello.com/b/UnJFyxSh/city-explorer
