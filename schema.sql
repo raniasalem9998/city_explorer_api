@@ -8,3 +8,4 @@ CREATE TABLE locations (
     longitude NUMERIC(10, 7),
     craeted_at BIGINT,
   );
+
