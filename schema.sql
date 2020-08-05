@@ -6,5 +6,5 @@ CREATE TABLE locations (
     formatted_query VARCHAR(255),
     latitude NUMERIC(10, 7),
     longitude NUMERIC(10, 7),
-    craeted_at BIGINT
+    craeted_at BIGINT,
   );
