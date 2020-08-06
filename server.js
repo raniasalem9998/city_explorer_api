@@ -2,7 +2,7 @@
 require('dotenv').config();
 const server = require('express');
 const cors = require('cors');
-const { request } = require('express');
+const { request, json } = require('express');
 const superagent = require('superagent');
 const app = server();
 const pg = require('pg')
@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 
 app.get('/', (request, response) => {
-  response.status(200).send('This is the homepage');
+  response.status(200).send('This is the homepage, choose the root you want (location,weather,movies,trials,yelp)');
 });
 
 // -------------------------location-----------------------------//
@@ -24,7 +24,11 @@ function handleLocation(request, response) {
   let city = request.query.city;
 
   let APIKEY = process.env.GEOCODE_API_KEY;
-  let url = `https://api.locationiq.com/v1/autocomplete.php?key=${APIKEY}&q=${city}&format=json?`;
+  let params = {
+   'key': APIKEY,
+   'q':city,
+  }
+  let url = `https://api.locationiq.com/v1/autocomplete.php?format=json?`;
   let selectSQL = `SELECT * FROM locations WHERE search_query = '${city}'`;
 
   client.query(selectSQL).then(result => {
@@ -33,7 +37,7 @@ function handleLocation(request, response) {
       response.send(result.rows[0]);
     } else {
 
-      return superagent.get(url).then(data => {
+      return superagent.get(url).query(params).then(data => {
         let locationData = new Location(city, data.body);
         let queryvalues = [locationData.search_query, locationData.formatted_query, locationData.latitude, locationData.longitude];
         let SQL = 'INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ($1,$2,$3,$4);';
@@ -51,15 +55,13 @@ function handleLocation(request, response) {
 };
 
 
-var loca = [];
+
 function Location(city, data) {
   this.search_query = city;
   this.formatted_query = data[0].display_name;
   this.latitude = data[0].lat;
   this.longitude = data[0].lon;
   this.country_code = data[0].address.country_code.toUpperCase();
-  loca.push(this.latitude)
-  loca.push(this.longitude)
 }
 
 
@@ -68,14 +70,18 @@ function Location(city, data) {
 app.get('/weather', (request, response) => {
   let cityName = request.query.search_query;
   let APIKEY2 = process.env.WEATHER_API_KEY;
+  let params={
+    'city':cityName,
+    'key':APIKEY2,
+  }
   // // if you wanted to use lat,lon(get them from the front end)
   // let lat = request.query.latitude;
   // let lon = request.query.longitude;
-  let url2 = `https://api.weatherbit.io/v2.0/forecast/daily?city=${cityName}&key=${APIKEY2}`;
+  let url2 = `https://api.weatherbit.io/v2.0/forecast/daily`;
 
   // we knew the data.body.data from the api website disciption
 
-  return superagent.get(url2).then((data) => {
+  return superagent.get(url2).query(params).then((data) => {
     Weather.all = [];
     // or instead of putting new array put the map in const then 
     data.body.data.map(element => {
@@ -112,9 +118,15 @@ app.get('/trails', (request, response) => {
   let APIKEY3 = process.env.TRAIL_API_KEY;
   let lat = request.query.latitude;
   let lon = request.query.longitude;
-  let url3 = `https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lon}&maxDistance=50&key=${APIKEY3}`;
+  let params = {
+    'lat': lat,
+    'lon':lon,
+    'maxDistance':50,
+    'key': APIKEY3,
+  }
+  let url3 = `https://www.hikingproject.com/data/get-trails`;
 
-  return superagent.get(url3).then(data => {
+  return superagent.get(url3).query(params).then(data => {
     let arr = [];
 
       data.body.trails.map(element => {
@@ -148,9 +160,13 @@ function Trail(data) {
 app.get('/movies', (request, response) => {
   let APIKEY4 = process.env.MOVIE_API_KEY;
   let region = request.query.country_code;
-  let url4 = `https://api.themoviedb.org/3/discover/movie?api_key=${APIKEY4}&certification_country=${region}`;
+  let params = {
+    'api_key':APIKEY4,
+    'certification_country':region,
+  }
+  let url4 = `https://api.themoviedb.org/3/discover/movie`;
 
-  return superagent.get(url4).then(data => {
+  return superagent.get(url4).query(params).then(data => {
     let arr = [];
 
       data.body.results.map(element => {
@@ -181,8 +197,15 @@ app.get('/yelp', (request, response) => {
   let lat = request.query.latitude;
   let lon = request.query.longitude;
   let yelp_key=process.env.YELP_API_KEY;
-  let url5 = `https://api.yelp.com/v3/businesses/search?latitude=${lat}&longitude=${lon}`;
-  return superagent.get(url5) .set('Authorization', `Bearer ${yelp_key}` ).then(data => {
+  let page = request.query.page;
+  let params ={
+    'latitude' : lat,
+    'longitude': lon,
+    'limit':5,
+    'offset': (5*page-4),
+  }
+  let url5 = `https://api.yelp.com/v3/businesses/search`;
+  return superagent.get(url5).query(params).set('Authorization', `Bearer ${yelp_key}`).then(data => {
     let arr = [];
 
       data.body.businesses.map(element => {
